@@ -1,5 +1,4 @@
 // API to register user
-import { useEffect } from "react";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js";
