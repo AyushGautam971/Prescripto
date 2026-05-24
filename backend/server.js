@@ -51,11 +51,21 @@ connectCloudinary()
 // middlewares
 app.use(express.json())
 
+const allowedOrigins = [
+    'https://prescripto-one-rose.vercel.app',
+    'https://prescripto-r9b6m98xs-ayushgautam971s-projects.vercel.app'
+]
+
 app.use(cors({
-    origin: ['https://prescripto-one-rose.vercel.app'],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
     credentials: true
 }))
-
 // api endpoints
 app.use('/api/admin', adminRouter)
 app.use('/api/doctor', doctorRouter)
