@@ -234,9 +234,41 @@ const razorpayInstance = new razorpay({
 
 // API to make payment of appointment using razorpay
 
-const paymentRazorpay = async(req, res) => {
+// const paymentRazorpay = async(req, res) => {
+//   try {
+//     const { appointmentId } = req.body;
+//     const appointmentData = await appointmentModel.findById(appointmentId);
+
+//     if (!appointmentData || appointmentData.cancelled) {
+//       return res.json({
+//         success: false,
+//         message: "Appointment Cancelled or not found",
+//       });
+//     }
+
+//     // creating options for razorpay payment
+
+//     const options = {
+//       amount: appointmentData.amount * 100,
+//       currency: process.env.CURRENCY,
+//       receipt: appointmentId,
+//     };
+
+//     // creating an order
+//     const order = await razorpayInstance.orders.create(options);
+//     res.json({ success: true, order });
+//   } catch (err) {
+//     console.log(err);
+//     res.json({ success: false, message: err.message });
+//   }
+// };
+// API to make payment of appointment using Razorpay
+
+const paymentRazorpay = async (req, res) => {
   try {
+
     const { appointmentId } = req.body;
+
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     if (!appointmentData || appointmentData.cancelled) {
@@ -246,23 +278,32 @@ const paymentRazorpay = async(req, res) => {
       });
     }
 
-    // creating options for razorpay payment
+    // Original amount in USD
+    const usdAmount = appointmentData.amount;
 
+    // USD to INR conversion rate
+    const usdToInr = 83;
+
+    // Convert into INR
+    const inrAmount = usdAmount * usdToInr;
+
+    // Razorpay options
     const options = {
-      amount: appointmentData.amount * 100,
-      currency: process.env.CURRENCY,
+      amount: Math.round(inrAmount * 100), // convert rupees to paise
+      currency: "INR",
       receipt: appointmentId,
     };
 
-    // creating an order
+    // Create order
     const order = await razorpayInstance.orders.create(options);
+
     res.json({ success: true, order });
+
   } catch (err) {
     console.log(err);
     res.json({ success: false, message: err.message });
   }
 };
-
 //API to verify payment to razorpay
 const verifyRazorpay = async(req,res)=>{
     try{
